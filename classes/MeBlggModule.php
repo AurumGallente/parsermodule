@@ -23,18 +23,19 @@ bx_import('BxDolModule');
 
 class MeBlggModule extends BxDolModule {
  
-    function __construct(){
-            
+//    function __construct(){
+//            
+//
+//
+//    }
+
+    function MeBlggModule(&$aModule) {        
+        parent::BxDolModule($aModule);
             ini_set('display_errors',1);
             ini_set('display_startup_errors',1);
             error_reporting(1);
             error_reporting(E_ALL);
             header('Content-Type: application/json');
-
-    }
-
-    function MeBlggModule(&$aModule) {        
-        parent::BxDolModule($aModule);
     }
 
     function actionHome () {
@@ -44,6 +45,12 @@ class MeBlggModule extends BxDolModule {
         $this->_oTemplate->pageCode(_t('_me_blgg'), true);
     }
     function actionJson() {
+        $this->bbc_uk_top_parse();
+    }
+    public function bbc_uk_top_parse(){
+        //bx_import('MeBlggDb', $this->_aModule);
+        //$db = new MeBlggDb();
+        //var_dump($this->_oDb->Insert(1));
         require 'ImageClass.php';
         $imageParser = new Parser_Provider_Image();
         //$channel = new Zend_Feed_Rss('http://feeds.bbci.co.uk/news/rss.xml?edition=uk');    
@@ -104,12 +111,16 @@ class MeBlggModule extends BxDolModule {
                             $news['date'] = $date;
                             $news['text'] = $string;
                             $news['author'] = 'BBC';			
-                $result[] = $news;         
-                if($i >= 2)
+                $result[] = $news;
+                $this->_oDb->Insert($news);
+                
+                if($i >= 1)
                     break;                
                 
             }
-            echo json_encode($result);
+            //echo json_encode($result);
+            $res = array($result, 'world');
+            //return $res;
     }
 }
 

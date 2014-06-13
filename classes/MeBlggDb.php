@@ -1,4 +1,4 @@
-<?
+<?php
 /***************************************************************************
 *                            Dolphin Smart Community Builder
 *                              -------------------
@@ -27,6 +27,14 @@ class MeBlggDb extends BxDolModuleDb {
 		parent::BxDolModuleDb();
         $this->_sPrefix = $oConfig->getDbPrefix();
     }
+        function Insert($data){
+          //$this->query("INSERT INTO `" . $this->_sPrefix . "handlers`(`alert_unit`, `alert_action`, `module_uri`, `module_class`, `module_method`, `groupable`, `group_by`, `timeline`, `outline`) VALUES('" . $aHandler['alert_unit'] . "', '" . $aHandler['alert_action'] . "', '" . $aHandler['module_uri'] . "', '" . $aHandler['module_class'] . "', '" . $aHandler['module_method'] . "', '" . $aHandler['groupable'] . "', '" . $aHandler['group_by'] . "', '" . $aHandler['timeline'] . "', '" . $aHandler['outline'] . "')");
+            $sql = "INSERT INTO par_items(`par_id`, `title`, `desc`, `link`, `image`, `text`, `author`, `date`) VALUES(".
+                    "1, `".$data['title']."`, `".$data['description']."`,`".$data['link']."`, `".$data['img']."`, `".$data['text']."`, `".$data['author']."`, `".$data['date']."`".
+                    ")";
+            echo $sql;exit;
+            //$this->query($sql);
+        }
 }
 
 ?>
