@@ -35,7 +35,7 @@ class MeBlggModule extends BxDolModule {
             //ini_set('display_startup_errors',1);
             //error_reporting(1);
             //error_reporting(E_ALL);
-            header('Content-Type: application/json');
+            //header('Content-Type: application/json');
     }
 
     function actionHome () {
@@ -130,6 +130,35 @@ class MeBlggModule extends BxDolModule {
         $result = $this->_oDb->select(1);
         echo json_encode($result);
        // var_dump($result);
+    }
+    public function actionTestrequest(){
+echo "<html>
+  <head>
+    <script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js\"></script>
+  </head>
+  <body>
+    <script>
+      // 1. The request domain has to be the same as server.php.
+      // 2. You could replace the following url with 'server.php'
+      $.getJSON('http://weber/modules/?r=bloggie/testrequest2',
+        {
+          param1: \"ykyuen\",
+          param2: \"eureka\"
+        },
+        success
+      );
+       
+      function success(data) {
+        $.each(data, function(key, val) {
+          $(\"body\").append(key + \" : \" + val + \"<br/>\");
+        });
+      }
+    </script>
+  </body>
+</html>";        
+    }
+    public function actionTestrequest2(){
+        var_dump(Zend_Json::decode($_REQUEST));
     }
 }
 
