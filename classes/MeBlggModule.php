@@ -31,10 +31,10 @@ class MeBlggModule extends BxDolModule {
 
     function MeBlggModule(&$aModule) {        
         parent::BxDolModule($aModule);
-            ini_set('display_errors',1);
-            ini_set('display_startup_errors',1);
-            error_reporting(1);
-            error_reporting(E_ALL);
+            //ini_set('display_errors',1);
+            //ini_set('display_startup_errors',1);
+            //error_reporting(1);
+            //error_reporting(E_ALL);
             header('Content-Type: application/json');
     }
 
@@ -112,9 +112,12 @@ class MeBlggModule extends BxDolModule {
                             $news['text'] = $string;
                             $news['author'] = 'BBC';			
                 $result[] = $news;
+                if(!isset($news['img'])){
+                    $news['img'] = '';
+                }
                 $this->_oDb->Insert($news);
                 
-                if($i >= 1)
+                if($i >= 50)
                     break;                
                 
             }
