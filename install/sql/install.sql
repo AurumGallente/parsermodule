@@ -17,3 +17,9 @@ CREATE TABLE `par_items` (
  `date` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
  PRIMARY KEY (`id`)
 );
+
+
+
+
+INSERT INTO `par` (`id`, `name`, `category`, `region`) VALUES
+(1, 'bbci', 'top', 'world');
