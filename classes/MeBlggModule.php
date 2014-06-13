@@ -45,7 +45,8 @@ class MeBlggModule extends BxDolModule {
         $this->_oTemplate->pageCode(_t('_me_blgg'), true);
     }
     function actionJson() {
-        $this->bbc_uk_top_parse();
+        //$this->bbc_uk_top_parse();
+        $this->get_bbc_uk_top();
     }
     public function bbc_uk_top_parse(){
         //bx_import('MeBlggDb', $this->_aModule);
@@ -124,6 +125,11 @@ class MeBlggModule extends BxDolModule {
             //echo json_encode($result);
             $res = array($result, 'world');
             //return $res;
+    }
+    public function get_bbc_uk_top(){
+        $result = $this->_oDb->select(1);
+        echo json_encode($result);
+       // var_dump($result);
     }
 }
 

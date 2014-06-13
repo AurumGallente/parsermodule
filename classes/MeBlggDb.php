@@ -39,6 +39,12 @@ class MeBlggDb extends BxDolModuleDb {
             //echo $sql;exit;
             $this->query($sql);
         }
+        function select($par_id){
+            //var_dump($par_id);
+            $par_id = (int)$par_id;
+            $sql = "SELECT * FROM par_items WHERE par_id = '$par_id'";
+            return  $this->getAll($sql);
+        }
 }
 
 ?>
