@@ -49,7 +49,46 @@ class MeBlggModule extends BxDolModule {
     function actionJson() {
         //$this->bbc_uk_top_parse();
         //$this->get_bbc_uk_top();
-        $this->daily_uk_top_parse();
+        //$this->daily_uk_top_parse();
+        $this->mcn_us_parse();  
+    }
+    public function mcn_us_parse(){
+        $channel = new Zend_Feed_Rss('http://entertainment.ca.msn.com/celebs/rss-celeb-news.aspx');
+        $i = 0;
+        foreach ($channel as $item) {
+                $i++;
+                $news = array();
+                $news['title'] = $item->title();
+                $news['description'] = $item->description();
+                $news['link'] = $item->link();
+                $news['date'] = $item->pubDate();
+                $news['author'] = 'msn.com';
+                $client = new Zend_Http_Client();
+                $client->setUri(trim($item->link()));
+                $response = $client->request(); 
+                $html = $response->getBody();                
+                //var_dump($news);
+                //var_dump($html);
+                $r1 = preg_match('/<div\sclass=\"img\">(.*?)<\/div>/s', $html, $res);
+                //var_dump($res[1]);
+                $im = preg_match('/src=\"(.*?)\"/', $res[1], $img);
+                //var_dump($img[1]);
+                $news['image'] = $img[1];
+                $news['img'] = $img[1];
+                $texts = preg_match('/svrichtxt\scf\">(.*?)<strong>/', $html, $res);
+                //var_dump($res);
+                $texts = preg_match_all('/<p>(.*?)<\/p>/', $res[1], $result);
+                //var_dump($result[1]);
+                $text = '';
+                foreach($result[1] as $r){
+                    $text .= strip_tags($r, '<p>');
+                }
+                //var_dump($text);
+                $news['text'] = $text;
+                $this->_oDb->Insert($news, 3);
+                if($i >= 10)
+                    break;  
+        }
     }
     public function daily_uk_top_parse(){
         $imageParser = new Parser_Provider_Image();        
@@ -119,7 +158,7 @@ class MeBlggModule extends BxDolModule {
                 $news['text'] = $text;
                 $news['author'] = 'dailymail';
                 $this->_oDb->Insert($news, 2);
-                if($i >= 10)
+                if($i >= 5)
                     break;       
         }
     }
