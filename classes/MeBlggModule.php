@@ -50,13 +50,59 @@ class MeBlggModule extends BxDolModule {
         //$this->bbc_uk_top_parse();
         //$this->get_bbc_uk_top();
         //$this->daily_uk_top_parse();
-        $this->mcn_us_parse();  
+        //$this->mcn_us_parse();
+        $this->sky_tech_parse();
+    }
+    public function sky_tech_parse(){
+        //http://news.sky.com/feeds/rss/technology.xml
+         $channel = new Zend_Feed_Rss('http://news.sky.com/feeds/rss/technology.xml');
+         $imageParser = new Parser_Provider_Image();
+         $i = 0;         
+         foreach ($channel as $item) {  
+                $height = 10;
+                $width = 10;
+                $news['title'] = $item->title();
+                $news['description'] = $item->description();
+                $news['description'] = $news['description'][1]->nodeValue;
+                $news['link'] = $item->link();
+                $news['date'] = $item->pubDate();
+                $news['author'] = 'sky.com';
+                $client = new Zend_Http_Client();
+                $client->setUri(trim($item->link()));
+                $response = $client->request(); 
+                $html = $response->getBody();
+                $r1 = preg_match_all('/figure(.*?)\/figure/s', $html, $matches);
+                foreach($matches[1] as $m){                    
+                    $r2 = preg_match_all('/src=\"(.*?)\"/', $m, $match);
+                    $image = $match[1][0];
+                    $dimentions = $imageParser->getImageSize($image);
+                    if(isset($dimentions[0])){
+                     if($dimentions[0]*$dimentions[1]> $height*$width){                        
+                          $news['img'] = $image;
+                          $width = $dimentions[0];
+                          $height = $dimentions[1];                     
+                     }
+                    }                    
+                }
+                $texts = preg_match('/<div\sid=\"articleText\">(.*?)<aside>/s', $html, $matches);
+                preg_match_all('/<p>(.*?)<\/p>/s', $matches[1], $t);
+                $text = '';
+                foreach($t[1] as $texts){
+                    $text .= $texts;
+                }
+                $news['text'] = $text;
+                $this->_oDb->Insert($news, 4);
+                if($i >= 5)
+                    break;   
+         }
     }
     public function mcn_us_parse(){
         $channel = new Zend_Feed_Rss('http://entertainment.ca.msn.com/celebs/rss-celeb-news.aspx');
         $i = 0;
         foreach ($channel as $item) {
-                $i++;
+                $i++;                               
+                $height = 10;
+                $width = 10;
                 $news = array();
                 $news['title'] = $item->title();
                 $news['description'] = $item->description();

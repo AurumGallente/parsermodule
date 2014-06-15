@@ -27,3 +27,5 @@ INSERT INTO `par` (`id`, `name`, `category`, `region`) VALUES
 (2, 'daily', 'top', 'UK');
 INSERT INTO `par` (`id`, `name`, `category`, `region`) VALUES
 (3, 'msn', 'Entertainment', 'UK');
+INSERT INTO `par` (`id`, `name`, `category`, `region`) VALUES
+(4, 'sky', 'Tech', 'UK');
