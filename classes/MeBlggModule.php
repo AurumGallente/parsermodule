@@ -31,11 +31,13 @@ class MeBlggModule extends BxDolModule {
 
     function MeBlggModule(&$aModule) {        
         parent::BxDolModule($aModule);
-            //ini_set('display_errors',1);
-            //ini_set('display_startup_errors',1);
-            //error_reporting(1);
-            //error_reporting(E_ALL);
-            //header('Content-Type: application/json');
+            ini_set('display_errors',1);
+            ini_set('display_startup_errors',1);
+            error_reporting(1);
+            error_reporting(E_ALL);
+            header('Content-Type: application/json');
+            require 'ImageClass.php';
+            $imageParser = new Parser_Provider_Image();
     }
 
     function actionHome () {
@@ -46,15 +48,80 @@ class MeBlggModule extends BxDolModule {
     }
     function actionJson() {
         //$this->bbc_uk_top_parse();
-        $this->get_bbc_uk_top();
+        //$this->get_bbc_uk_top();
+        $this->daily_uk_top_parse();
+    }
+    public function daily_uk_top_parse(){
+        $imageParser = new Parser_Provider_Image();        
+        $channel = new Zend_Feed_Rss('http://www.dailymail.co.uk/news/index.rss');
+        $i = 0;
+        foreach($channel as $item){
+                $i++;
+                $height = 10;
+                $width = 10;
+                $news = array();
+                $news['title'] = $item->title();
+                //$news['description'] = $item->description();
+                $news['link'] = trim($item->link());
+                $news['date'] = $item->pubDate();
+                $user_agent='Mozilla/5.0 (Windows NT 6.1; rv:8.0) Gecko/20100101 Firefox/8.0';
+                $options = array(
+
+                    CURLOPT_CUSTOMREQUEST  =>"GET",        //set request type post or get
+                    CURLOPT_POST           =>false,        //set to GET
+                    CURLOPT_USERAGENT      => $user_agent, //set user agent
+                    CURLOPT_COOKIEFILE     =>"cookie.txt", //set cookie file
+                    CURLOPT_COOKIEJAR      =>"cookie.txt", //set cookie jar
+                    CURLOPT_RETURNTRANSFER => true,     // return web page
+                    CURLOPT_HEADER         => false,    // don't return headers
+                    CURLOPT_FOLLOWLOCATION => true,     // follow redirects
+                    CURLOPT_ENCODING       => "",       // handle all encodings
+                    CURLOPT_AUTOREFERER    => true,     // set referer on redirect
+                    CURLOPT_CONNECTTIMEOUT => 120,      // timeout on connect
+                    CURLOPT_TIMEOUT        => 120,      // timeout on response
+                    CURLOPT_MAXREDIRS      => 10,       // stop after 10 redirects
+                );
+
+                $ch      = curl_init(trim($item->link));
+                curl_setopt_array( $ch, $options );
+                $content = curl_exec( $ch );
+                $err     = curl_errno( $ch );
+                $errmsg  = curl_error( $ch );
+                $header  = curl_getinfo( $ch );
+                curl_close( $ch );
+                $header['errno']   = $err;
+                $header['errmsg']  = $errmsg;
+                $header['content'] = $content;                
+                $description = preg_match('/<h1>(.*?)<\/h1>/', $content, $matches);
+                $news['description'] = $description;
+                $v = preg_match_all('/src=\"(.*?)\"\s/', $content, $n);
+                $images = array();
+                foreach($n[1] as $image){
+                   unset($dimentions); 
+                   $dimentions = $imageParser->getImageSize($image);
+                   //var_dump($dimentions);
+                   if(isset($dimentions[0])){
+                    if($dimentions[0]*$dimentions[1]> $height*$width){                        
+                         $news['img'] = $image;
+                         $width = $dimentions[0];
+                         $height = $dimentions[1];                     
+                    }
+                   }
+                }
+                $text = preg_match_all('/<p\sclass=\"mol\-para\-with\-font\">(.*?)<\/p>/', $content, $texts);
+                //var_dump($texts[1]);
+                $text = '';
+                foreach($texts[1] as $t){
+                    $text .= $t;
+                }
+                $news['text'] = $text;
+                $news['author'] = 'dailymail';
+                if($i >= 1)
+                    break;       
+        }
     }
     public function bbc_uk_top_parse(){
-        //bx_import('MeBlggDb', $this->_aModule);
-        //$db = new MeBlggDb();
-        //var_dump($this->_oDb->Insert(1));
-        require 'ImageClass.php';
-        $imageParser = new Parser_Provider_Image();
-        //$channel = new Zend_Feed_Rss('http://feeds.bbci.co.uk/news/rss.xml?edition=uk');    
+   
             $channel = new Zend_Feed_Rss('http://feeds.bbci.co.uk/news/rss.xml?edition=uk');
             //echo $channel->title();
             $i = 0;
@@ -118,7 +185,7 @@ class MeBlggModule extends BxDolModule {
                 }
                 $this->_oDb->Insert($news);
                 
-                if($i >= 50)
+                if($i >= 10)
                     break;                
                 
             }
