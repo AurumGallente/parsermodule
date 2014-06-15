@@ -55,6 +55,7 @@ class MeBlggModule extends BxDolModule {
         $imageParser = new Parser_Provider_Image();        
         $channel = new Zend_Feed_Rss('http://www.dailymail.co.uk/news/index.rss');
         $i = 0;
+        $result = array();
         foreach($channel as $item){
                 $i++;
                 $height = 10;
@@ -93,7 +94,8 @@ class MeBlggModule extends BxDolModule {
                 $header['errmsg']  = $errmsg;
                 $header['content'] = $content;                
                 $description = preg_match('/<h1>(.*?)<\/h1>/', $content, $matches);
-                $news['description'] = $description;
+                $news['description'] = $matches[1];
+                //var_dump($matches[1]);
                 $v = preg_match_all('/src=\"(.*?)\"\s/', $content, $n);
                 $images = array();
                 foreach($n[1] as $image){
@@ -116,7 +118,8 @@ class MeBlggModule extends BxDolModule {
                 }
                 $news['text'] = $text;
                 $news['author'] = 'dailymail';
-                if($i >= 1)
+                $this->_oDb->Insert($news, 2);
+                if($i >= 10)
                     break;       
         }
     }

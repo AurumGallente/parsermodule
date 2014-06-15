@@ -23,3 +23,5 @@ CREATE TABLE `par_items` (
 
 INSERT INTO `par` (`id`, `name`, `category`, `region`) VALUES
 (1, 'bbci', 'top', 'world');
+INSERT INTO `par` (`id`, `name`, `category`, `region`) VALUES
+(2, 'daily', 'top', 'UK');
